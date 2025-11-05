@@ -1,0 +1,844 @@
+:root {
+      --bg: #f8f9fb;
+      --panel: #f8f9fb;
+      --muted: #f1f4f8;
+      --border: #e6e8eb;
+      --text: #2b2f36;
+      --text-muted: #6b7280;
+      --bubble-user: #e8eaed;
+      --bubble-bot: #f5f6f7;
+      --shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+      --radius: 16px;
+      /* 为左右两侧头像、间距以及气泡与头像的边距都预留空间，使两侧气泡最大宽度对齐 */
+      --bubble-side-margin: 16px;
+      --bubble-max: calc(100% - (2 * (var(--avatar-size) + var(--gap) + var(--bubble-side-margin))));
+      --avatar-size: 48px;
+      --gap: 10px;
+      --chat-width: clamp(360px, 80%, 960px);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft Yahei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    body.sidebar-open {
+      overflow: hidden;
+    }
+
+    .app {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* 左侧会话栏 */
+    .sidebar {
+      width: 300px;
+      flex: 0 0 300px;
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: transform .25s ease, width .25s ease, opacity .2s ease;
+    }
+
+    .sidebar-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .title {
+      font-size: 16px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--muted);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 12px;
+      transition: all .15s ease;
+    }
+
+    .btn:hover {
+      background: #e9edf1;
+    }
+
+    .collapse-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background .15s ease;
+    }
+
+    .collapse-toggle:hover {
+      background: var(--muted);
+    }
+
+    .collapse-toggle .collapse-icon {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      transition: transform .2s ease;
+    }
+
+    .collapse-toggle .collapse-icon::before,
+    .collapse-toggle .collapse-icon::after {
+      content: '';
+      position: absolute;
+      background: var(--text);
+      transition: transform .2s ease, background .15s ease;
+    }
+
+    .collapse-toggle .collapse-icon::before,
+    .collapse-toggle .collapse-icon::after {
+      width: 12px;
+      height: 2px;
+      border-radius: 1px;
+    }
+
+    .collapse-toggle .collapse-icon::before {
+      transform: rotate(45deg);
+    }
+
+    .collapse-toggle .collapse-icon::after {
+      transform: rotate(-45deg);
+    }
+
+    .collapse-toggle.collapsed .collapse-icon::before {
+      transform: rotate(0deg);
+    }
+
+    .collapse-toggle.collapsed .collapse-icon::after {
+      transform: rotate(90deg);
+    }
+
+    .session-list {
+      list-style: none;
+      margin: 0;
+      padding: 20px 24px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .session-list::-webkit-scrollbar {
+      width: 1px;
+    }
+
+    .session-list::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .session-list::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 1px;
+    }
+
+    .session-item {
+      padding: 12px 24px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--panel);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      cursor: pointer;
+      transition: transform .12s ease, box-shadow .12s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .session-item:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+    }
+
+    .session-item.active {
+      border-color: #d1d5db;
+      background: #fafafa;
+    }
+
+    .session-title {
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 右侧聊天区 */
+    .chat-pane {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      box-shadow: var(--shadow);
+    }
+
+    .chat-pane.is-empty {
+      justify-content: center;
+      align-items: center;
+    }
+
+    .chat-pane.is-empty .messages {
+      display: none;
+    }
+
+    .chat-pane.is-empty .input-bar {
+      flex: 1;
+      padding: 0;
+      width: 100%;
+      justify-content: center;
+      align-items: center;
+      display: flex;
+    }
+
+    .chat-pane.is-empty .input-shell {
+      width: calc(var(--chat-width) - (2 * (var(--avatar-size) + var(--gap) + var(--bubble-side-margin))));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      margin: 0 auto;
+    }
+
+    .chat-pane.is-empty .input-greeting {
+      display: block;
+    }
+
+    .chat-toolbar {
+      display: none;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    body.sidebar-hidden .chat-toolbar {
+      display: flex;
+    }
+
+    .sidebar-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 15px;
+      transition: background .15s ease, color .15s ease, border-color .15s ease;
+    }
+
+    .sidebar-toggle:hover {
+      background: var(--muted);
+    }
+
+    .sidebar-toggle-icon {
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .sidebar-toggle-label {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .messages {
+      flex: 1;
+      padding: 32px 0 0;
+      /* 始终显示滚动条，避免出现/消失导致宽度变化 */
+      overflow-y: scroll;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .messages.is-empty {
+      display: none;
+    }
+
+    .row {
+      display: flex;
+      width: var(--chat-width);
+      margin: 10px auto;
+      gap: var(--gap);
+      align-items: flex-end;
+      min-width: 0;
+    }
+
+    .row.user {
+      justify-content: flex-end;
+    }
+
+    .row.bot {
+      justify-content: flex-start;
+    }
+
+    .row.bot,
+    .row.loading {
+      align-items: flex-start;
+    }
+
+    .row.bot::after,
+    .row.user::before {
+      content: none;
+      display: none;
+    }
+
+    .row.bot .bubble {
+      margin-left: 16px;
+    }
+
+    .row.user .bubble {
+      margin-right: 16px;
+    }
+
+    .identity {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .avatar {
+      width: var(--avatar-size);
+      height: var(--avatar-size);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+    }
+
+    .avatar.ai {
+      background: #eef1f4;
+    }
+
+    .avatar img {
+      width: 70%;
+      height: 70%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .avatar.user {
+      background: #e6e8eb;
+    }
+
+    .bubble {
+      max-width: var(--bubble-max);
+      flex: 0 0 auto;
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      display: inline-flex;
+      flex-direction: column;
+      align-items: stretch;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow: hidden;
+      min-width: 0;
+      width: fit-content;
+    }
+
+    .bubble p {
+      margin: 0;
+    }
+
+    .row.user .bubble {
+      background: var(--bubble-user);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .row.bot .bubble {
+      background: var(--bubble-bot);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .bubble.bubble-table {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-start;
+      /* 气泡自身按内容自适应，最大宽度受头像左侧限制 */
+      width: fit-content;
+      max-width: var(--bubble-max);
+    }
+
+    .bubble-chart {
+      width: 100%;
+      min-height: 240px;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .bubble-chart canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .bubble-content {
+      display: inline-block;
+      width: auto;
+    }
+
+    .bubble-table table {
+      margin: 0;
+      width: 100%;
+      max-width: 100%;
+      /* 固定布局，忽略内容对列宽的影响，列宽更一致 */
+      table-layout: fixed;
+    }
+    /* 更高优先级覆盖，保证短表格也占满容器宽度 */
+    table.bubble-table.table-short {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .bubble-table-row {
+      display: inline-flex;
+      align-items: flex-start;
+      gap: 0;
+    }
+
+    .bubble-table-summary {
+      margin-top: 6px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .bubble-table-summary blockquote {
+      margin: 0;
+      font-size: 11px;
+      color: var(--text-muted);
+      flex: 1;
+    }
+
+    .bubble-table-summary .bubble-actions {
+      margin-top: 0;
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .bubble-table-summary .bubble-toggle,
+    .bubble-table-summary .bubble-export {
+      flex-shrink: 0;
+    }
+
+    .bubble-actions {
+      margin-top: 0;
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .bubble-export {
+      padding: 6px 12px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      font-size: 12px;
+      cursor: pointer;
+      transition: background .15s ease, color .15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bubble-summary-placeholder {
+      flex: 1;
+      display: inline-block;
+      min-height: 0;
+    }
+
+    .bubble-export:hover {
+      background: var(--muted);
+    }
+
+    .bubble-toggle {
+      padding: 6px 12px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      font-size: 12px;
+      cursor: pointer;
+      transition: background .15s ease, color .15s ease;
+    }
+
+    .bubble-toggle:hover {
+      background: var(--muted);
+    }
+
+    .bubble-table table.collapsible tbody tr.is-hidden {
+      display: none;
+    }
+
+    .bubble-table table {
+      font-size: 17px;
+    }
+
+    .bubble-table table th,
+    .bubble-table table td {
+      min-width: 160px;
+      padding: 12px 16px;
+      word-break: break-word;
+    }
+
+    .bubble-table table.table-compact {
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .bubble-table table.table-compact th,
+    .bubble-table table.table-compact td {
+      padding: 8px 12px;
+      min-width: 140px;
+      word-break: break-word;
+    }
+
+    table tbody tr:nth-child(odd) {
+      background: #f4f6fb;
+    }
+
+    table tbody tr:nth-child(even) {
+      background: #fafbfd;
+    }
+
+    .loading .bubble {
+      font-style: italic;
+      color: var(--text-muted);
+    }
+
+    .input-bar {
+      border-top: none;
+      padding: 20px 0 28px;
+      display: flex;
+      justify-content: center;
+      background: transparent;
+    }
+
+    .input-shell {
+      position: relative;
+      width: calc(var(--chat-width) - (2 * (var(--avatar-size) + var(--gap) + var(--bubble-side-margin))));
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    .input-greeting {
+      margin-bottom: 16px;
+      font-size: 16px;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .input-control {
+      position: relative;
+      width: 100%;
+    }
+
+    #input {
+      width: 100%;
+      padding: 14px 54px 14px 18px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      outline: none;
+      font-size: 14px;
+      background: var(--muted);
+      resize: none;
+      min-height: 48px;
+      max-height: 160px;
+      line-height: 1.6;
+      overflow-y: hidden;
+      margin: 0 auto;
+      display: block;
+    }
+
+    .input-send {
+      position: absolute;
+      top: 50%;
+      right: 16px;
+      transform: translateY(-50%);
+      border: none;
+      background: none;
+      color: var(--text);
+      font-size: 18px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      transition: background .15s ease, color .15s ease;
+    }
+
+    .input-send:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .input-send:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Markdown 内容微样式 */
+    table {
+      border-collapse: collapse;
+      margin: 8px auto;
+      width: 100%;
+      max-width: 100%;
+      font-size: 16px;
+    }
+
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 12px 20px;
+      text-align: center;
+      min-width: 190px;
+    }
+
+    th {
+      background: #f6f7f9;
+      font-weight: 600;
+    }
+
+    table.table-short {
+      width: auto;
+      max-width: 100%;
+      min-width: min(640px, 100%);
+    }
+
+    table.table-short th,
+    table.table-short td {
+      text-align: center;
+    }
+
+    pre {
+      background: #f7f8f9;
+      padding: 10px;
+      border-radius: 10px;
+      overflow-x: auto;
+    }
+
+    code {
+      background: #f7f8f9;
+      padding: 2px 4px;
+      border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    blockquote {
+      border-left: 4px solid #e5e7eb;
+      margin: 8px 0;
+      padding-left: 12px;
+      color: var(--text-muted);
+    }
+
+    .session-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .session-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .session-delete {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 50%;
+      font-size: 14px;
+      display: inline-flex;
+      width: 28px;
+      height: 28px;
+      align-items: center;
+      justify-content: center;
+      margin-left: auto;
+      margin-right: -6px;
+      transition: background .15s ease, color .15s ease, transform .15s ease;
+    }
+
+    .session-delete:hover {
+      background: var(--muted);
+      color: var(--text);
+      transform: scale(1.05);
+    }
+
+    .session-delete-icon {
+      width: 16px;
+      height: 16px;
+      display: block;
+    }
+
+    .sidebar-backdrop {
+      display: none;
+    }
+
+    body.sidebar-hidden .sidebar {
+      width: 0;
+      flex: 0 0 0;
+      transform: translateX(-100%);
+      opacity: 0;
+      pointer-events: none;
+      border-right: none;
+      box-shadow: none;
+    }
+
+    body.sidebar-hidden .sidebar-header,
+    body.sidebar-hidden .session-list {
+      opacity: 0;
+    }
+
+    body.sidebar-hidden .chat-pane {
+      flex: 1;
+    }
+
+    @media (max-width: 768px) {
+      .app {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        max-width: 85vw;
+        width: 280px;
+        flex: 0 0 280px;
+        transform: translateX(-100%);
+        transition: transform .25s ease;
+        z-index: 30;
+        box-shadow: 6px 0 20px rgba(0, 0, 0, 0.08);
+      }
+
+      body.sidebar-hidden .sidebar {
+        width: 280px;
+        flex: 0 0 280px;
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .sidebar-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .2s ease;
+        z-index: 20;
+        display: block;
+      }
+
+      .sidebar-backdrop.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .chat-toolbar {
+        display: flex;
+      }
+
+      .collapse-toggle {
+        display: none;
+      }
+
+      .messages {
+        padding: 16px 0 0;
+      }
+
+      .input-bar {
+        padding: 16px 0 24px;
+      }
+    }
